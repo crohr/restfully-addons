@@ -1,0 +1,1 @@
+require 'restfully/addons/bonfire'
