@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('rake', '~> 0.8')
 
-  s.files = Dir.glob("{lib}/**/*") + %w(Rakefile LICENSE README.md)
+  s.files = Dir.glob("{lib,examples}/**/*") + %w(Rakefile LICENSE README.md)
 
   # s.test_files = Dir.glob("spec/**/*")
 
