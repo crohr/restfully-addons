@@ -84,7 +84,14 @@ begin
     # See <http://net-ssh.github.com/scp/v1/api/index.html> for more details.
 
     session.logger.info "Content of uploaded file:"
-    session.logger.info ssh.exec!("cat /tmp/file.log")
+    puts ssh.exec!("cat /tmp/file.log")
+
+    session.logger.info "Installing things..."
+    output = ssh.exec!("apt-get install curl -y")
+    session.logger.debug output
+
+    session.logger.info "Running query against API..."
+    puts ssh.exec!("source /etc/default/bonfire && curl -k $BONFIRE_URI/locations/$BONFIRE_PROVIDER/computes/$BONFIRE_RESOURCE_ID -u $BONFIRE_CREDENTIALS")
   end
 
   session.logger.warn "Success! Will delete experiment in 10 seconds. Hit CTRL-C now to keep your VMs..."
