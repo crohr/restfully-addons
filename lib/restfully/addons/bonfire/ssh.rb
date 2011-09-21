@@ -4,11 +4,16 @@ require 'net/sftp'
 
 module Restfully
   class Resource
+    # Opens an SSH session on the resource's IP.
+    # Returns the result of the last statement of the given block.
     def ssh(user = nil, opts = {}, &block)
       raise NotImplementedError unless uri.to_s =~ /\/computes\/\w+$/
       @ssh ||= SSH.new(session, self)
-      @ssh.run(@ssh.ip, user, opts, &block) if block
-      @ssh
+      if block
+        @ssh.run(@ssh.ip, user, opts, &block)
+      else
+        @ssh
+      end
     end
   end
   
@@ -27,10 +32,18 @@ module Restfully
       gateway = session.config[:gateway]
       if gateway
         gateway_handler = Net::SSH::Gateway.new(gateway, session.config[:username], options)
-        gateway_handler.ssh(fqdn, user, options, &block)
+        result = nil
+        gateway_handler.ssh(fqdn, user, options) {|handler|
+          result = block.call(handler)
+        }
         gateway_handler.shutdown!
+        result
       else
-        Net::SSH.start(fqdn, user, options, &block)
+        result = nil
+        Net::SSH.start(fqdn, user, options) {|handler|
+          result = block.call(handler)
+        }
+        result
       end
     end
     
