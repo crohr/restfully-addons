@@ -29,6 +29,11 @@ module Restfully
       user ||= 'root'
       session.logger.info "Trying to SSH into #{user}@#{fqdn}..."
       options[:keys] ||= session.config[:keys]
+      options[:keys_only] = if session.config[:keys_only]
+        session.config[:keys_only]
+      elsif options[:keys]
+        true
+      end
       gateway = session.config[:gateway]
       if gateway
         gateway_handler = Net::SSH::Gateway.new(gateway, session.config[:username], options)
@@ -51,7 +56,7 @@ module Restfully
       @ip ||= accessible?
     end
     
-    def accessible?
+    def accessible?(options = {})
       return false if resource['nic'].empty?
       accessible_nic = resource['nic'].find{|nic|
         ip = nic['ip']
@@ -60,7 +65,7 @@ module Restfully
         else
           begin
             Timeout.timeout(10) do
-              run(ip, 'root') {|s| s.exec!("hostname") }
+              run(ip, 'root', options) {|s| s.exec!("hostname") }
             end
             true
           rescue Exception => e
