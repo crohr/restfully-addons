@@ -7,7 +7,7 @@ module Restfully
     # Opens an SSH session on the resource's IP.
     # Returns the result of the last statement of the given block.
     def ssh(user = nil, opts = {}, &block)
-      raise NotImplementedError unless uri.to_s =~ /\/computes\/\w+$/
+      raise NotImplementedError unless uri.to_s =~ /\/computes\/[^\/]+$/
       @ssh ||= SSH.new(session, self)
       if block
         @ssh.run(@ssh.ip, user, opts, &block)
