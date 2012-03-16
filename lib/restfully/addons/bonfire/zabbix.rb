@@ -85,23 +85,26 @@ module Restfully
         "output" => "extend"
       }).map{|i| i['itemid']}
 
-      history = case options[:type]
+      options[:type] = case options[:type]
+      when Fixnum
+        options[:type]
       when :numeric
         0
       else
-        1 # STRING
+        nil
       end
 
       # Most recent last
       now = Time.now.to_i
-      results = request("history.get", {
+      payload = {
         "itemids" => items[0..1],
         # FIX once we can correctly specify metric type
-        "history" => history, 
         "output" => "extend",
-        "time_from" => now-3600,
-        "time_till" => now
-      })
+        "time_from" => options[:from] || now-3600,
+        "time_till" => options[:till] || now
+      }
+      payload["history"] = options[:type] unless options[:type].nil?
+      results = request("history.get", payload)
 
       Metric.new(name, results, options)
     end
@@ -116,7 +119,7 @@ module Restfully
       def values
         @results.map{|r| 
           case @opts[:type]
-          when :numeric
+          when :numeric, 0, 3
             r['value'].to_f
           else
             r['value']
