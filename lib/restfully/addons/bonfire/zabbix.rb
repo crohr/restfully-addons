@@ -22,7 +22,7 @@ module Restfully
       @zabbix ||= Zabbix.new(session, self)
     end
   end
-  
+
   class Zabbix
     attr_reader :session, :experiment
     def initialize(session, experiment, opts = {})
@@ -72,7 +72,7 @@ module Restfully
     def authenticate
       @token = request("user.authenticate", {"user" => @username, "password" => @password})
     end
-    
+
     def metric(name, options = {})
       hosts = [options.delete(:hosts) || []].flatten.map{|h|
         [h['name'], h['id']].join("-")
@@ -117,7 +117,7 @@ module Restfully
       end
 
       def values
-        @results.map{|r| 
+        @results.map{|r|
           case @opts[:type]
           when :numeric, 0, 3
             r['value'].to_f
@@ -127,7 +127,8 @@ module Restfully
         }.reverse
       end
     end
-    
+
   end
-  
+
 end
+
