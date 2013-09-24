@@ -28,7 +28,7 @@ module Restfully
     def initialize(session, experiment, opts = {})
       @session = session
       @username = opts[:username] || "Admin"
-      @password = opts[:password] || "zabbix"
+      @password = opts[:password] || experiment['aggregator_password']
       @experiment = experiment
       @token, @request_id = nil, 0
       @uri = @experiment.uri.to_s+"/zabbix"
